@@ -1,0 +1,4 @@
+pydantic
+openai
+tiktoken
+python-dotenv

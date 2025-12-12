@@ -1,0 +1,8 @@
+{
+  "relevance_score": 0.0,
+  "relevance_reasoning": "Error: Error code: 401 - {'error': {'message': 'Incorrect API key provided: dummy-ke*****-now. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}",
+  "hallucination_score": 0.0,
+  "hallucination_reasoning": "Error: Error code: 401 - {'error': {'message': 'Incorrect API key provided: dummy-ke*****-now. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}",
+  "latency_ms": 9000.0,
+  "estimated_cost_usd": 0.29676
+}
