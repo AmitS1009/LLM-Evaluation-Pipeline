@@ -11,13 +11,8 @@ load_dotenv()
 def load_json_with_comments(path):
     with open(path, 'r', encoding='utf-8') as f:
         content = f.read()
-        # 1. Remove // comments but protect URLs (https://)
         content = re.sub(r"(?<!:)//.*", "", content)
-        # 2. Remove /* */ comments (multiline)
         content = re.sub(r"/\*.*?\*/", "", content, flags=re.DOTALL)
-        
-        # 3. Remove trailing commas (e.g. [1, 2,] -> [1, 2])
-        # Match matches comma, whitespace, then ] or }
         content = re.sub(r",\s*(?=[\]}])", "", content)
 
         try:
@@ -30,32 +25,30 @@ def main():
     parser.add_argument("--conversation_path", type=str, required=True, help="Path to conversation JSON")
     parser.add_argument("--context_path", type=str, required=True, help="Path to context JSON")
     parser.add_argument("--output_path", type=str, default="evaluation_report.json", help="Path to save output JSON")
-    
+    parser.add_argument("--model_openai", type=str, default="gpt-3.5-turbo", help="OpenAI model to use (if key present)")
+    parser.add_argument("--model_gemini", type=str, default="gemini-pro", help="Gemini model to use (if key present)")
+
     args = parser.parse_args()
 
     try:
         conv_data = load_json_with_comments(args.conversation_path)
         ctx_data = load_json_with_comments(args.context_path)
 
-        # Parse using Pydantic models
         conversation = Conversation.model_validate(conv_data)
         context = Context.model_validate(ctx_data)
 
-        # Run pipeline
-        pipeline = EvaluationPipeline()
+        # Pass model config to pipeline
+        pipeline = EvaluationPipeline(model_openai=args.model_openai, model_gemini=args.model_gemini)
         result = pipeline.run(conversation, context)
 
-        # Print to console
         print(json.dumps(result.dict(), indent=2))
         
-        # Save to file
         with open(args.output_path, 'w') as f:
             json.dump(result.dict(), f, indent=2)
 
     except Exception as e:
         import traceback
         traceback.print_exc()
-        # print(f"Error during execution: {e}")
 
 if __name__ == "__main__":
     main()

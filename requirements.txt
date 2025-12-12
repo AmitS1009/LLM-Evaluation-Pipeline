@@ -2,3 +2,4 @@ pydantic
 openai
 tiktoken
 python-dotenv
+google-generativeai

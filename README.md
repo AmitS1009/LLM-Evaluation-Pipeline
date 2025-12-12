@@ -67,13 +67,20 @@ Running `GPT-4` based evaluation on 100% of traffic is cost-prohibitive.
 1.  **Environment**:
     ```bash
     pip install -r requirements.txt
-    # Create .env file with OPENAI_API_KEY=sk-...
+    # Create .env file with your keys:
+    OPENAI_API_KEY=sk-...
+    GEMINI_API_KEY=AIza...
     ```
 
 2.  **Run the Pipeline**:
-    ```bash
-    python main.py --conversation_path data/sample_conv.json --context_path data/sample_ctx.json
-    ```
+    *   **OpenAI Default**:
+        ```bash
+        python main.py --conversation_path data/sample_conv.json --context_path data/sample_ctx.json
+        ```
+    *   **Using Gemini**:
+        ```bash
+        python main.py --conversation_path ... --context_path ... --model_gemini gemini-1.5-flash
+        ```
 
 ---
 *Built with precision, designed for scale.*

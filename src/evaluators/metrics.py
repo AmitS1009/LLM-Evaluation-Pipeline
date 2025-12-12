@@ -9,7 +9,9 @@ class MetricsEvaluator(BaseEvaluator):
             "gpt-4": (0.03, 0.06),
             "gpt-3.5-turbo": (0.0005, 0.0015),
             "gpt-4o": (0.005, 0.015),
-            "gpt-4o-mini": (0.00015, 0.0006)
+            "gpt-4o-mini": (0.00015, 0.0006),
+            "gemini-pro": (0.000125, 0.000375), # Approx pricing for Gemini Pro 1.5
+            "gemini-1.5-flash": (0.00001875, 0.000075) # Much cheaper
         }
 
     def _count_tokens(self, text: str) -> int:
@@ -20,19 +22,17 @@ class MetricsEvaluator(BaseEvaluator):
         return len(encoding.encode(text))
 
     def evaluate(self, conversation: Conversation, context: Context) -> dict:
-        messages = conversation.messages # Uses the property accessor
+        messages = conversation.messages 
         if not messages:
             return {"latency_ms": None, "estimated_cost_usd": 0.0}
 
         # 1. Latency Calculation
-        # Identify the LAST turn where AI responded.
         latency = None
         if len(messages) >= 2:
             last_msg = messages[-1]
             prev_msg = messages[-2]
             
-            # Roles in new JSON: "User", "AI/Chatbot"
-            # Normalize for checking
+            # Roles: "User", "AI/Chatbot"
             last_role = last_msg.role.lower()
             prev_role = prev_msg.role.lower()
 
@@ -46,7 +46,7 @@ class MetricsEvaluator(BaseEvaluator):
         output_tokens = 0
         
         for msg in messages:
-            count = self._count_tokens(msg.message) # Field is 'message' now
+            count = self._count_tokens(msg.message) 
             if "ai" in msg.role.lower():
                 output_tokens += count
             else:
@@ -55,6 +55,7 @@ class MetricsEvaluator(BaseEvaluator):
         for chunk in context.context_chunks:
             input_tokens += self._count_tokens(chunk)
 
+        # Fallback to gpt-4 pricing if unknown model
         input_price, output_price = self.pricing.get(conversation.model, self.pricing["gpt-4"])
         cost = (input_tokens / 1000 * input_price) + (output_tokens / 1000 * output_price)
 
